@@ -1,0 +1,2 @@
+<p>Datenbank Eintr&auml;ge: <?php echo $GLOBALS['view_data']['countDatbaseEntrys']; ?> <a href="?M=tools_txstaticfilecachemanangerM1&action=allDatabaseEntrys">alle anzeigen</a></p>
+<p>Cache Dateien: <?php echo $GLOBALS['view_data']['countFiles']; ?> <a href="?M=tools_txstaticfilecachemanangerM1&action=allFiles">alle anzeigen</a></p>

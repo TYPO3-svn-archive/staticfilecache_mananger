@@ -1,0 +1,5 @@
+<phpunit>
+	<testsuite name="staticfilecache_mananger_tests">
+		<directory suffix="Test.php">./</directory>
+	</testsuite>
+</phpunit>
