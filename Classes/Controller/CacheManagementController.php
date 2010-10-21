@@ -106,12 +106,26 @@ class Tx_StaticfilecacheMananger_Controller_CacheManagementController {
 		return $this->allFilesAction();
 	}
 	
-/**
+	/**
 	 * @return string
 	 */
 	public function allDatabaseEntrysAction() {
 		$this->view->assign ( 'allDatabaseEntrys', $this->cacheDatabaseEntryRepository->getAll () );
 		return $this->view->render ( 'allDatabaseEntrys' );
+	}
+	/**
+	 * @return string
+	 */
+	public function allFoldersAction() {
+		$this->view->assign ( 'allFolders', $this->cacheFileRepository->getAllFolders () );
+		return $this->view->render ( 'allFolders' );
+	}
+/**
+	 * @return string
+	 */
+	public function deleteFolderAction() {
+		$this->cacheFileRepository->removeFolder($_GET['id']);
+		return $this->allFoldersAction();
 	}
 
 }

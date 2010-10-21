@@ -63,4 +63,50 @@ class Tx_StaticfilecacheMananger_Controller_CacheManagementControllerTest extend
 		$this->cacheFileRepository->expects($this->once())->method('countAll');
 		$this->cacheManagementController->indexAction ();
 	}
+	
+/**
+	 * Tests Tx_StaticfilecacheMananger_Controller_CacheManagementController->allFilesAction()
+	 * @test
+	 */
+	public function allFilesAction() {
+		$this->view->expects($this->once())->method('render');
+		$this->cacheFileRepository->expects($this->once())->method('getAll');
+		$this->cacheManagementController->allFilesAction ();
+	}
+/**
+	 * Tests Tx_StaticfilecacheMananger_Controller_CacheManagementController->deleteFileAction()
+	 * @test
+	 */
+	public function deleteFileAction() {
+		$this->view->expects($this->once())->method('render');
+		$this->cacheFileRepository->expects($this->once())->method('removeFile');
+		$this->cacheManagementController->deleteFileAction ();
+	}
+/**
+	 * Tests Tx_StaticfilecacheMananger_Controller_CacheManagementController->allDatabaseEntrysAction()
+	 * @test
+	 */
+	public function allDatabaseEntrysAction() {
+		$this->view->expects($this->once())->method('render');
+		$this->cacheDatabaseEntryRepository->expects($this->once())->method('getAll');
+		$this->cacheManagementController->allDatabaseEntrysAction ();
+	}
+/**
+	 * Tests Tx_StaticfilecacheMananger_Controller_CacheManagementController->allFoldersAction()
+	 * @test
+	 */
+	public function allFoldersAction() {
+		$this->view->expects($this->once())->method('render');
+		$this->cacheFileRepository->expects($this->once())->method('getAllFolders');
+		$this->cacheManagementController->allFoldersAction ();
+	}
+/**
+	 * Tests Tx_StaticfilecacheMananger_Controller_CacheManagementController->deleteFolderAction()
+	 * @test
+	 */
+	public function deleteFolderAction() {
+		$this->view->expects($this->once())->method('render');
+		$this->cacheFileRepository->expects($this->once())->method('removeFolder');
+		$this->cacheManagementController->deleteFolderAction ();
+	}
 }

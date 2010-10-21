@@ -1,4 +1,4 @@
-<p>Alle Dateien:</p>
+<p>Alle Ordner:</p>
 <table border="0" cellspacing="1" class="lrPadding" width="100%">
 	<tr class="bgColor5 tableheader">
 		
@@ -7,11 +7,11 @@
 	</tr>
 
 <?php 
-foreach($GLOBALS['view_data']['allFiles'] as $file){
+foreach($GLOBALS['view_data']['allFolders'] as $file){
 	?>
 	<tr class="bgColor4">
 		<td><?php echo $file->getName(); ?></td>
-		<td><a href="?action=deleteFile&id=<?php echo $file->getIdentifier(); ?>">L&ouml;schen</a></td>
+		<td><a href="?action=deleteFolder&id=<?php echo $file->getIdentifier(); ?>">L&ouml;schen</a></td>
 		
 	</tr>
 	<?php 

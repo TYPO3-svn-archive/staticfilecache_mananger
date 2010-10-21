@@ -1,6 +1,6 @@
 <h2>Alle Dateien:</h2>
-<table border="1">
-	<tr>
+<table border="0" cellspacing="1" class="lrPadding" width="100%">
+	<tr class="bgColor5 tableheader">
 		<th>tstamp</th>
 		<th>crdate</th>
 		<th>cache_timeout</th>
@@ -15,7 +15,7 @@
 <?php 
 foreach($GLOBALS['view_data']['allDatabaseEntrys'] as $databaseEntry){
 	?>
-	<tr>
+	<tr class="bgColor4">
 		<td><?php echo date('d.m.Y H:i:s',$databaseEntry->getTstamp()); ?></td>
 		<td><?php echo date('d.m.Y H:i:s',$databaseEntry->getCrdate()); ?></td>
 		<td><?php echo date('d.m.Y H:i:s',$databaseEntry->getCache_timeout()); ?></td>

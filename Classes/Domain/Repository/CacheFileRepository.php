@@ -8,7 +8,7 @@
  *
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-require_once dirname ( __FILE__ ) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR.'Model' . DIRECTORY_SEPARATOR . 'CacheFile.php';
+require_once dirname ( __FILE__ ) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Model' . DIRECTORY_SEPARATOR . 'CacheFile.php';
 /**
  * file cache repository
  * @package staticfilecache_mananger
@@ -22,14 +22,34 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository {
 	 * @return integer
 	 */
 	public function countAll() {
-		return $this->count($this->getFiles());
+		return $this->count ( $this->getFiles () );
 	}
 	
 	/**
 	 * @return array
 	 */
 	public function getAll() {
-		return $this->reconstitute($this->getFiles());
+		return $this->reconstitute ( $this->getFiles () );
+	}
+	/**
+	 * @return array
+	 */
+	public function getAllFolders() {
+		$files = $this->getFolders ();
+		$folders = array ();
+		foreach ( $files as $file ) {
+			if ($file->isDir ()) {
+				$name = $this->replacePath ( $file->getPath () );
+				if (! isset ( $folders [$name] ) && '' !== $name) {
+					$cacheFile = new Tx_StaticfilecacheMananger_Domain_Model_CacheFile ();
+					$cacheFile->setName ( $name );
+					$folders [$name] = $cacheFile;
+				}
+			
+			}
+		
+		}
+		return $folders;
 	}
 	/**
 	 * @return string
@@ -46,26 +66,65 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository {
 	/**
 	 * @param string $id
 	 */
-	public function removeFile($id){
-		$fileName = base64_decode($id);
-		if(FALSE === $fileName || FALSE !== strpos($fileName,'..') ){
-			throw new Exception('invalid id');
+	public function removeFile($id) {
+		$fileName = base64_decode ( $id );
+		if (FALSE === $fileName || FALSE !== strpos ( $fileName, '..' )) {
+			throw new Exception ( 'invalid id' );
 		}
-		if(FALSE === unlink($this->cacheDir.$fileName)){
-			throw new Exception('could not delete file: '.$fileName);
+		$path = $this->cacheDir . $fileName;
+		if (is_file ( $path )) {
+			if (FALSE === unlink ( $path )) {
+				throw new Exception ( 'could not delete file: ' . $path );
+			}
+		} else {
+			throw new Exception ( 'could not delete file: ' . $path );
 		}
-		
+	
 	}
 	/**
-	 * @param RegexIterator $regexIterator
+	 * @param string $id
+	 */
+	public function removeFolder($id) {
+		$fileName = base64_decode ( $id );
+		if (FALSE === $fileName || FALSE !== strpos ( $fileName, '..' )) {
+			throw new Exception ( 'invalid id' );
+		}
+		$path = $this->cacheDir . $fileName;
+		if (FALSE === is_dir ( $path )) {
+			throw new Exception ( 'path is not a folder: ' . $path );
+		}
+		$temp_path = $path . '_to_be_deleted';
+		if (FALSE === rename ( $path, $temp_path )) {
+			throw new Exception ( 'could not rename folder: ' . $path );
+		}
+		$dir = new RecursiveIteratorIterator ( new RecursiveDirectoryIterator ( $temp_path ), RecursiveIteratorIterator::CHILD_FIRST );
+		for($dir->rewind (); $dir->valid (); $dir->next ()) {
+			if ($dir->isDir ()) {
+				if (FALSE === rmdir ( $dir->getPathname () )) {
+					throw new Exception ( 'could not delete dir: ' . $dir->getPathname () );
+				}
+			} else {
+				if (FALSE === unlink ( $dir->getPathname () )) {
+					throw new Exception ( 'could not delete file: ' . $dir->getPathname () );
+				}
+			}
+		}
+		if (FALSE === rmdir ( $temp_path )) {
+			throw new Exception ( 'could not delete dir: ' . $temp_path );
+		}
+	
+	}
+	
+	/**
+	 * @param Iterator $regexIterator
 	 * @return array
 	 */
-	private function reconstitute(RegexIterator $regexIterator){
-		$files = array();
-		foreach( $regexIterator as $file){
-			$cacheFile = new Tx_StaticfilecacheMananger_Domain_Model_CacheFile();
-			$cacheFile->setName(str_replace($this->cacheDir,'',$file[0]));
-			$files[] = $cacheFile;
+	private function reconstitute(Iterator $regexIterator) {
+		$files = array ();
+		foreach ( $regexIterator as $file ) {
+			$cacheFile = new Tx_StaticfilecacheMananger_Domain_Model_CacheFile ();
+			$cacheFile->setName ( $this->replacePath ( $file [0] ) );
+			$files [] = $cacheFile;
 		}
 		return $files;
 	}
@@ -73,9 +132,9 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository {
 	 * @param RegexIterator $regexIterator
 	 * @return integer
 	 */
-	private function count(RegexIterator $regexIterator){
+	private function count(RegexIterator $regexIterator) {
 		$count = 0;
-		foreach( $regexIterator as $file){
+		foreach ( $regexIterator as $file ) {
 			$count ++;
 		}
 		return $count;
@@ -83,12 +142,26 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository {
 	/**
 	 * @return RegexIterator
 	 */
-	private function getFiles(){
+	private function getFiles() {
 		$folder = $this->cacheDir;
-		$directory = new RecursiveDirectoryIterator($folder);
-		$iterator = new RecursiveIteratorIterator($directory);
-		$regex = new RegexIterator($iterator, '/^.+\.html$/i', RecursiveRegexIterator::GET_MATCH);
+		$directory = new RecursiveDirectoryIterator ( $folder );
+		$iterator = new RecursiveIteratorIterator ( $directory );
+		$regex = new RegexIterator ( $iterator, '/^.+\.html$/i', RecursiveRegexIterator::GET_MATCH );
 		return $regex;
 	}
-
+	/**
+	 * @return RecursiveIteratorIterator
+	 */
+	private function getFolders() {
+		$folder = $this->cacheDir;
+		$objects = new RecursiveIteratorIterator ( new RecursiveDirectoryIterator ( $folder ), RecursiveIteratorIterator::SELF_FIRST );
+		return $objects;
+	}
+	/**
+	 * @param string $path
+	 * @return string
+	 */
+	private function replacePath($path) {
+		return str_replace ( substr ( $this->cacheDir, 0, strlen ( $this->cacheDir ) - 1 ), '', $path );
+	}
 }
