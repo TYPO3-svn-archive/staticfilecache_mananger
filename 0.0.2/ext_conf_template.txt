@@ -1,5 +1,0 @@
-# cat=basic; type=string; label=Path to static cache
-cacheDir = typo3temp/tx_ncstaticfilecache/
-
-# cat=basic; type=string; label=Table of the static cache
-fileTable = tx_ncstaticfilecache_file
