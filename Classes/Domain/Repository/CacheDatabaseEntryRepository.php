@@ -18,6 +18,7 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository 
 	 * @var string
 	 */
 	private $fileTable;
+	
 	/**
 	 * @return integer
 	 */
@@ -30,12 +31,6 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository 
 	public function getAll() {
 		return $this->query();
 	}
-	/**
-	 * @return string
-	 */
-	public function getFileTable() {
-		return $this->fileTable;
-	}
 	
 	/**
 	 * @param string $fileTable
@@ -43,6 +38,14 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository 
 	public function setFileTable($fileTable) {
 		$this->fileTable = $fileTable;
 	}
+	
+	/**
+	 * @return string
+	 */
+	protected function getFileTable() {
+		return $this->fileTable;
+	}
+
 	/**
 	 * @param string $where
 	 * @return array
@@ -61,6 +64,7 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository 
 			$entry->setExplanation($row['explanation']);
 			$entry->setHost($row['host']);
 			$entry->setFile($row['file']);
+			$entry->setPid($row['pid']);
 			$entry->setUri($row['uri']);
 			$entry->setIsdirty($row['isdirty']);
 			$entry->setReg1($row['reg1']);

@@ -6,7 +6,7 @@
 </style>
 
 
-<h2>Alle Ordner:</h2>
+<h2>Alle Ordner (<?php echo count($GLOBALS['view_data']['allFolders']). ' Einträge';?>):</h2>
 <table border="0" cellspacing="1" class="lrPadding" width="100%">
 	<tr class="bgColor5 tableheader">
 		
