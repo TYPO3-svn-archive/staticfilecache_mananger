@@ -1,4 +1,12 @@
-<p>Alle Ordner:</p>
+<style type="text/css">
+<!--
+	table td.nowrap		{ white-space:nowrap; }
+	table.lrPadding td	{ padding-left: 5px; padding-right: 5px; }
+-->
+</style>
+
+
+<h2>Alle Ordner:</h2>
 <table border="0" cellspacing="1" class="lrPadding" width="100%">
 	<tr class="bgColor5 tableheader">
 		
@@ -10,9 +18,8 @@
 foreach($GLOBALS['view_data']['allFolders'] as $file){
 	?>
 	<tr class="bgColor4">
-		<td><?php echo $file->getName(); ?></td>
-		<td><a href="?action=deleteFolder&id=<?php echo $file->getIdentifier(); ?>">L&ouml;schen</a></td>
-		
+		<td class="nowrap"><?php echo $file->getName(); ?></td>
+		<td class="nowrap"><a href="?action=deleteFolder&id=<?php echo $file->getIdentifier(); ?>">L&ouml;schen</a></td>
 	</tr>
 	<?php 
 }

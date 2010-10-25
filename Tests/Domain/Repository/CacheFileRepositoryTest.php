@@ -60,7 +60,7 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepositoryTest exten
 	public function getAllFolders() {
 		$results = $this->cacheFileRepository->getAllFolders ();
 		$this->assertType ( 'array', $results );
-		$this->assertEquals(2,count($results));
+		$this->assertEquals(3,count($results));
 		foreach($results as $result){
 			$this->assertType ( 'Tx_StaticfilecacheMananger_Domain_Model_CacheFile', $result );
 			$this->assertNotNull( $result->getName() );

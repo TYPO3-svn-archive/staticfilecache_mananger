@@ -37,18 +37,18 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository {
 	public function getAllFolders() {
 		$files = $this->getFolders ();
 		$folders = array ();
-		foreach ( $files as $file ) {
+		foreach ( $files as $fileName => $file ) {
 			if ($file->isDir ()) {
-				$name = $this->replacePath ( $file->getPath () );
+				$name = $this->replacePath ( $fileName );
 				if (! isset ( $folders [$name] ) && '' !== $name) {
 					$cacheFile = new Tx_StaticfilecacheMananger_Domain_Model_CacheFile ();
 					$cacheFile->setName ( $name );
 					$folders [$name] = $cacheFile;
 				}
-			
 			}
-		
 		}
+		sort( $folders );
+
 		return $folders;
 	}
 	/**
@@ -56,12 +56,6 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository {
 	 */
 	public function getCacheDir() {
 		return $this->cacheDir;
-	}
-	/**
-	 * @param string $cacheDir
-	 */
-	public function setCacheDir($cacheDir) {
-		$this->cacheDir = $cacheDir;
 	}
 	/**
 	 * @param string $id
@@ -79,7 +73,6 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository {
 		} else {
 			throw new Exception ( 'could not delete file: ' . $path );
 		}
-	
 	}
 	/**
 	 * @param string $id
@@ -112,20 +105,26 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository {
 		if (FALSE === rmdir ( $temp_path )) {
 			throw new Exception ( 'could not delete dir: ' . $temp_path );
 		}
-	
 	}
-	
+	/**
+	 * @param string $cacheDir
+	 */
+	public function setCacheDir($cacheDir) {
+		$this->cacheDir = $cacheDir;
+	}
+
 	/**
 	 * @param Iterator $regexIterator
 	 * @return array
 	 */
 	private function reconstitute(Iterator $regexIterator) {
 		$files = array ();
-		foreach ( $regexIterator as $file ) {
+		foreach ( $regexIterator as $fileName => $file ) {
 			$cacheFile = new Tx_StaticfilecacheMananger_Domain_Model_CacheFile ();
-			$cacheFile->setName ( $this->replacePath ( $file [0] ) );
+			$cacheFile->setName ( $this->replacePath ( $fileName ) );
 			$files [] = $cacheFile;
 		}
+		sort( $files );
 		return $files;
 	}
 	/**
@@ -162,6 +161,6 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository {
 	 * @return string
 	 */
 	private function replacePath($path) {
-		return str_replace ( substr ( $this->cacheDir, 0, strlen ( $this->cacheDir ) - 1 ), '', $path );
+		return str_replace ( substr ( $this->cacheDir, 0, strlen ( $this->cacheDir ) ), '', $path );
 	}
 }

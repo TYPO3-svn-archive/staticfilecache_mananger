@@ -49,7 +49,8 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository 
 	 */
 	private function query($where = '1=1'){
 		$db = $GLOBALS['TYPO3_DB'];
-		$rows = $db->exec_SELECTgetRows('*', $this->getFileTable(), $where);
+		$orderBy = 'host,uri';
+		$rows = $db->exec_SELECTgetRows('*', $this->getFileTable(), $where, '', $orderBy);
 		$entries = array();
 		foreach($rows as $row){
 			$entry = new Tx_StaticfilecacheMananger_Domain_Model_CacheDatabaseEntry();

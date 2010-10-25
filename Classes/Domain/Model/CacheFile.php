@@ -17,25 +17,23 @@ class Tx_StaticfilecacheMananger_Domain_Model_CacheFile {
 	 * @var string
 	 */
 	private $name;
-	/**
-	 * @return string
-	 */
-	public function getName() {
-		return $this->name;
-	}
 	
-	/**
-	 * @param string $name
-	 */
-	public function setName($name) {
-		$this->name = $name;
-	}
 	/**
 	 * @return string
 	 */
 	public function getIdentifier() {
 		return base64_encode ( $this->name );
 	}
-
+	/**
+	 * @return string
+	 */
+	public function getName() {
+		return $this->name;
+	}
+	/**
+	 * @param string $name
+	 */
+	public function setName($name) {
+		$this->name = $name;
+	}
 }
-
