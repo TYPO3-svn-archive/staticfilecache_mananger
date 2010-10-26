@@ -50,20 +50,27 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepositoryTest exten
 		$this->assertEquals(2,count($results));
 		foreach($results as $result){
 			$this->assertType ( 'Tx_StaticfilecacheMananger_Domain_Model_CacheFile', $result );
-			$this->assertNotNull( $result->getName() );
+			$this->assertTrue( in_array($result->getName(), array('test.html','test/test.html')) );
 		}
 	}
-/**
+	/**
 	 * Tests Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository->getAllFolders()
 	 * @test
 	 */
 	public function getAllFolders() {
-		$results = $this->cacheFileRepository->getAllFolders ();
+		$results = $this->cacheFileRepository->getAllFolders ( TRUE );
 		$this->assertType ( 'array', $results );
 		$this->assertEquals(3,count($results));
 		foreach($results as $result){
 			$this->assertType ( 'Tx_StaticfilecacheMananger_Domain_Model_CacheFile', $result );
-			$this->assertNotNull( $result->getName() );
+			$this->assertTrue( in_array($result->getName(), array('test','test/test2','test/test2/test3')) );
+		}
+		$results = $this->cacheFileRepository->getAllFolders ( FALSE );
+		$this->assertType ( 'array', $results );
+		$this->assertEquals(1,count($results));
+		foreach($results as $result){
+			$this->assertType ( 'Tx_StaticfilecacheMananger_Domain_Model_CacheFile', $result );
+			$this->assertEquals( $result->getName(), 'test' );
 		}
 	}
 }

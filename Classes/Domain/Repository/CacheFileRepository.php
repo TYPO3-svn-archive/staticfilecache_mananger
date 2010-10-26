@@ -32,23 +32,26 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository {
 		return $this->reconstitute ( $this->getFiles () );
 	}
 	/**
-	 * @return array
+	 * @param	$getFoldersWhichDoesNotContainFiles get folders, which doesn't contain any files
+	 * @return	array
 	 */
-	public function getAllFolders() {
+	public function getAllFolders($getFoldersWhichDoesNotContainFiles = TRUE) {
 		$files = $this->getFolders ();
 		$folders = array ();
-		foreach ( $files as $fileName => $file ) {
-			if ($file->isDir ()) {
-				$name = $this->replacePath ( $fileName );
-				if (! isset ( $folders [$name] ) && '' !== $name) {
-					$cacheFile = new Tx_StaticfilecacheMananger_Domain_Model_CacheFile ();
-					$cacheFile->setName ( $name );
-					$folders [$name] = $cacheFile;
-				}
+		foreach ( $files as $file ) {
+			$name = '';
+			if ($getFoldersWhichDoesNotContainFiles === TRUE && $file->isDir ()) {
+				$name = $this->replacePath ( $file->getPathname() );
+			} elseif ($getFoldersWhichDoesNotContainFiles === FALSE && $file->isFile ()) {
+				$name = $this->replacePath ( $file->getPath() );
+			}
+			if (! isset ( $folders [$name] ) && '' !== $name) {
+				$cacheFile = new Tx_StaticfilecacheMananger_Domain_Model_CacheFile ();
+				$cacheFile->setName ( $name );
+				$folders [$name] = $cacheFile;
 			}
 		}
 		sort( $folders );
-
 		return $folders;
 	}
 	/**
@@ -161,6 +164,10 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository {
 	 * @return string
 	 */
 	private function replacePath($path) {
-		return str_replace ( substr ( $this->cacheDir, 0, strlen ( $this->cacheDir ) ), '', $path );
+		$replacedPath = str_replace ( substr ( $this->getCacheDir(), 0, strlen ( $this->getCacheDir() ) ), '', $path );
+		if($replacedPath === $this->getCacheDir() || $replacedPath.'/' === $this->getCacheDir()) {
+			return '';
+		}
+		return $replacedPath;
 	}
 }

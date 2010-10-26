@@ -6,6 +6,20 @@
 </style>
 
 
+<form name="setConfigGetFoldersWhichDoesNotContainFiles" action="index.php" method="GET">
+	<?php
+	$checked = '';
+	if($GLOBALS['BE_USER']->getModuleData('tx_staticfilecache_manager_getFoldersWhichDoesNotContainFiles') !== FALSE) {
+		$checked = ' checked="checked"';
+	}
+	?>
+	<input type="hidden" name="action" value="setConfigGetFoldersWhichDoesNotContainFiles" />
+	<input onClick="javascript:this.form.submit();" type="checkbox" value="1" name="getFoldersWhichDoesNotContainFiles" <?php echo $checked;?> />
+	Ordner, welche keine Dateien enthalten, anzeigen
+</form>
+<br /><br />
+
+
 <h2>Alle Ordner (<?php echo count($GLOBALS['view_data']['allFolders']). ' Einträge';?>):</h2>
 <table border="0" cellspacing="1" class="lrPadding" width="100%">
 	<tr class="bgColor5 tableheader">

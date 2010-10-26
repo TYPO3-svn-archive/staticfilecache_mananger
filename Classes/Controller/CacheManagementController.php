@@ -117,15 +117,22 @@ class Tx_StaticfilecacheMananger_Controller_CacheManagementController {
 	 * @return string
 	 */
 	public function allFoldersAction() {
-		$this->view->assign ( 'allFolders', $this->cacheFileRepository->getAllFolders () );
+		$getFoldersWhichDoesNotContainFiles = $GLOBALS['BE_USER']->getModuleData('tx_staticfilecache_manager_getFoldersWhichDoesNotContainFiles') === FALSE ? FALSE : TRUE;
+		$this->view->assign ( 'allFolders', $this->cacheFileRepository->getAllFolders ( $getFoldersWhichDoesNotContainFiles ) );
 		return $this->view->render ( 'allFolders' );
 	}
-/**
+	/**
 	 * @return string
 	 */
 	public function deleteFolderAction() {
 		$this->cacheFileRepository->removeFolder($_GET['id']);
 		return $this->allFoldersAction();
 	}
-
+	/**
+	 * @return string
+	 */
+	public function setConfigGetFoldersWhichDoesNotContainFilesAction() {
+		$GLOBALS['BE_USER']->pushModuleData('tx_staticfilecache_manager_getFoldersWhichDoesNotContainFiles', (boolean) t3lib_div::_GP('getFoldersWhichDoesNotContainFiles'));
+		return $this->allFoldersAction();
+	}
 }
