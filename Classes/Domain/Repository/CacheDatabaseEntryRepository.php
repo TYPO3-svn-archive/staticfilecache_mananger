@@ -48,6 +48,27 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository 
 
 	/**
 	 * @param string $where
+	 * @return integer
+	 */
+	private function count($where = ''){
+		$db = $GLOBALS['TYPO3_DB'];
+		return intval($db->exec_SELECTcountRows('uid', $this->getFileTable(),$where));
+	}
+	/**
+	 * @param	array $row
+	 * @return	Tx_StaticfilecacheMananger_Domain_Model_CacheDatabaseEntry
+	 */
+	private function createCacheDatabaseEntry(array $row) {
+		$entry = new Tx_StaticfilecacheMananger_Domain_Model_CacheDatabaseEntry();
+		$entry->setRecordKeys( array_keys($row) );
+		foreach($row as $key => $value) {
+			$methodName = 'set'.ucfirst($key);
+			call_user_func(array($entry, $methodName), $value);
+		}
+		return $entry;
+	}
+	/**
+	 * @param string $where
 	 * @return array
 	 */
 	private function query($where = '1=1'){
@@ -56,31 +77,8 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository 
 		$rows = $db->exec_SELECTgetRows('*', $this->getFileTable(), $where, '', $orderBy);
 		$entries = array();
 		foreach($rows as $row){
-			$entry = new Tx_StaticfilecacheMananger_Domain_Model_CacheDatabaseEntry();
-			$entry->setUid($row['uid']);
-			$entry->setTstamp($row['tstamp']);
-			$entry->setCrdate($row['crdate']);
-			$entry->setCache_timeout($row['cache_timeout']);
-			$entry->setExplanation($row['explanation']);
-			$entry->setHost($row['host']);
-			$entry->setFile($row['file']);
-			$entry->setPid($row['pid']);
-			$entry->setUri($row['uri']);
-			$entry->setIsdirty($row['isdirty']);
-			$entry->setReg1($row['reg1']);
-			$entry->setAdditionalhash($row['additionalhash']);
-			$entries[] = $entry;
+			$entries[] = $this->createCacheDatabaseEntry( $row );
 		}
 		return $entries;
 	}
-	/**
-	 * @param string $where
-	 * @return integer
-	 */
-	private function count($where = ''){
-		$db = $GLOBALS['TYPO3_DB'];
-		return intval($db->exec_SELECTcountRows('uid', $this->getFileTable(),$where));
-	}
-	
-
 }
