@@ -29,110 +29,147 @@ class Tx_StaticfilecacheMananger_Controller_CacheManagementController {
 	 * @var Tx_StaticfilecacheMananger_View_View
 	 */
 	private $view;
+
 	/**
 	 * Initializes  controller
-	 */
-	public function __construct() {
-		$this->cacheDatabaseEntryRepository = t3lib_div::makeInstance ( 'Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository' );
-		$this->cacheFileRepository = t3lib_div::makeInstance ( 'Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository' );
-		$this->view = t3lib_div::makeInstance ( 'Tx_StaticfilecacheMananger_View_View' );
-		$this->view->setTemplatePath ( dirname ( __FILE__ ) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR . 'Private' . DIRECTORY_SEPARATOR . 'Templates' . DIRECTORY_SEPARATOR );
-		$conf = unserialize ( $GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['staticfilecache_mananger'] );
-		$this->cacheFileRepository->setCacheDir ( PATH_site . $conf ['cacheDir'] );
-		$this->cacheDatabaseEntryRepository->setFileTable ( $conf ['fileTable'] );
-	
-	}
-	/**
-	 * @return Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository
-	 */
-	/**
-	 * @return Tx_StaticfilecacheMananger_View_View
-	 */
-	public function getView() {
-		return $this->view;
-	}
-	
-	/**
+	 * @param Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository	$cacheDatabaseEntryRepository
+	 * @param Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository			$cacheFileRepository
 	 * @param Tx_StaticfilecacheMananger_View_View $view
 	 */
-	public function setView(Tx_StaticfilecacheMananger_View_View $view) {
-		$this->view = $view;
+	public function __construct(Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository $cacheDatabaseEntryRepository, Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository $cacheFileRepository, Tx_StaticfilecacheMananger_View_View $view) {
+		$this->setCacheDatabaseEntryRepository( $cacheDatabaseEntryRepository );
+		$this->setCacheFileRepository( $cacheFileRepository );
+		$this->setView( $view );
+		$this->getView()->setTemplatePath ( dirname ( __FILE__ ) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR . 'Private' . DIRECTORY_SEPARATOR . 'Templates' . DIRECTORY_SEPARATOR );
+		$conf = unserialize ( $GLOBALS ['TYPO3_CONF_VARS'] ['EXT'] ['extConf'] ['staticfilecache_mananger'] );
+		$this->getCacheDatabaseEntryRepository()->setFileTable ( $conf ['fileTable'] );
+		$this->getCacheFileRepository()->setCacheDir ( PATH_site . $conf ['cacheDir'] );
 	}
-	
-	public function getCacheDatabaseEntryRepository() {
-		return $this->cacheDatabaseEntryRepository;
+
+	/**
+	 * @return string
+	 */
+	public function allDatabaseEntrysAction() {
+		try {
+			$this->getView()->assign ( 'allDatabaseEntrys', $this->getCacheDatabaseEntryRepository()->getAll () );
+			return $this->getView()->render ( 'allDatabaseEntrys' );
+		} catch (Exception $e) {
+			return $this->showErrorMessage($e);
+		}
 	}
 	/**
-	 * @return Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository
+	 * @return string
 	 */
-	public function getCacheFileRepository() {
-		return $this->cacheFileRepository;
+	public function allFilesAction() {
+		try {
+			$this->getView()->assign ( 'allFiles', $this->getCacheFileRepository()->getAll () );
+			return $this->getView()->render ( 'allFiles' );
+		} catch (Exception $e) {
+			return $this->showErrorMessage($e);
+		}
 	}
-	
 	/**
-	 * @param Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository $cacheDatabaseEntryRepository
+	 * @return string
 	 */
-	public function setCacheDatabaseEntryRepository(Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository $cacheDatabaseEntryRepository) {
-		$this->cacheDatabaseEntryRepository = $cacheDatabaseEntryRepository;
+	public function allFoldersAction() {
+		try {
+			$getFoldersWhichDoesNotContainFiles = $GLOBALS['BE_USER']->getModuleData('tx_staticfilecache_manager_getFoldersWhichDoesNotContainFiles') === FALSE ? FALSE : TRUE;
+			$this->getView()->assign ( 'allFolders', $this->getCacheFileRepository()->getAllFolders ( $getFoldersWhichDoesNotContainFiles ) );
+			return $this->getView()->render ( 'allFolders' );
+		} catch (Exception $e) {
+			return $this->showErrorMessage($e);
+		}
 	}
-	
 	/**
-	 * @param Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository $cacheFileRepository
+	 * @return string
 	 */
-	public function setCacheFileRepository(Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository $cacheFileRepository) {
-		$this->cacheFileRepository = $cacheFileRepository;
+	public function deleteFileAction() {
+		try {
+			$this->getCacheFileRepository()->removeFile($_GET['id']);
+			return $this->allFilesAction();
+		} catch (Exception $e) {
+			return $this->showErrorMessage($e);
+		}
+	}
+	/**
+	 * @return string
+	 */
+	public function deleteFolderAction() {
+		try {
+			$this->getCacheFileRepository()->removeFolder($_GET['id']);
+			return $this->allFoldersAction();
+		} catch (Exception $e) {
+			return $this->showErrorMessage($e);
+		}
 	}
 	/**
 	 * Show the count of both repositorys
 	 * @return string
 	 */
 	public function indexAction() {
-		$this->view->assign ( 'countFiles', $this->cacheFileRepository->countAll () );
-		$this->view->assign ( 'countDatbaseEntrys', $this->cacheDatabaseEntryRepository->countAll () );
-		return $this->view->render ( 'index' );
-	}
-	/**
-	 * @return string
-	 */
-	public function allFilesAction() {
-		$this->view->assign ( 'allFiles', $this->cacheFileRepository->getAll () );
-		return $this->view->render ( 'allFiles' );
-	}
-	/**
-	 * @return string
-	 */
-	public function deleteFileAction() {
-		$this->cacheFileRepository->removeFile($_GET['id']);
-		return $this->allFilesAction();
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function allDatabaseEntrysAction() {
-		$this->view->assign ( 'allDatabaseEntrys', $this->cacheDatabaseEntryRepository->getAll () );
-		return $this->view->render ( 'allDatabaseEntrys' );
-	}
-	/**
-	 * @return string
-	 */
-	public function allFoldersAction() {
-		$getFoldersWhichDoesNotContainFiles = $GLOBALS['BE_USER']->getModuleData('tx_staticfilecache_manager_getFoldersWhichDoesNotContainFiles') === FALSE ? FALSE : TRUE;
-		$this->view->assign ( 'allFolders', $this->cacheFileRepository->getAllFolders ( $getFoldersWhichDoesNotContainFiles ) );
-		return $this->view->render ( 'allFolders' );
-	}
-	/**
-	 * @return string
-	 */
-	public function deleteFolderAction() {
-		$this->cacheFileRepository->removeFolder($_GET['id']);
-		return $this->allFoldersAction();
+		try {
+			$this->getView()->assign ( 'countFiles', $this->getCacheFileRepository()->countAll () );
+			$this->getView()->assign ( 'countDatbaseEntrys', $this->getCacheDatabaseEntryRepository()->countAll () );
+			return $this->getView()->render ( 'index' );
+		} catch (Exception $e) {
+			return $this->showErrorMessage($e);
+		}	
 	}
 	/**
 	 * @return string
 	 */
 	public function setConfigGetFoldersWhichDoesNotContainFilesAction() {
-		$GLOBALS['BE_USER']->pushModuleData('tx_staticfilecache_manager_getFoldersWhichDoesNotContainFiles', (boolean) t3lib_div::_GP('getFoldersWhichDoesNotContainFiles'));
-		return $this->allFoldersAction();
+		try {
+			$GLOBALS['BE_USER']->pushModuleData('tx_staticfilecache_manager_getFoldersWhichDoesNotContainFiles', (boolean) t3lib_div::_GP('getFoldersWhichDoesNotContainFiles'));
+			return $this->allFoldersAction();
+		} catch (Exception $e) {
+			return $this->showErrorMessage($e);
+		}
+	}
+
+	/**
+	 * @return Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository
+	 */
+	private function getCacheDatabaseEntryRepository() {
+		return $this->cacheDatabaseEntryRepository;
+	}
+	/**
+	 * @return Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository
+	 */
+	private function getCacheFileRepository() {
+		return $this->cacheFileRepository;
+	}
+	/**
+	 * @return Tx_StaticfilecacheMananger_View_View
+	 */
+	private function getView() {
+		return $this->view;
+	}
+
+	/**
+	 * @param Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository $cacheDatabaseEntryRepository
+	 */
+	private function setCacheDatabaseEntryRepository(Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository $cacheDatabaseEntryRepository) {
+		$this->cacheDatabaseEntryRepository = $cacheDatabaseEntryRepository;
+	}
+	/**
+	 * @param Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository $cacheFileRepository
+	 */
+	private function setCacheFileRepository(Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository $cacheFileRepository) {
+		$this->cacheFileRepository = $cacheFileRepository;
+	}
+	/**
+	 * @param Tx_StaticfilecacheMananger_View_View $view
+	 */
+	private function setView(Tx_StaticfilecacheMananger_View_View $view) {
+		$this->view = $view;
+	}
+	/**
+	 * @param Exception $exception
+	 * @return string
+	 */
+	private function showErrorMessage(Exception $exception) {
+		$this->getView()->assign ( 'errorMessage', $exception->getMessage() );
+		return $this->getView()->render ( 'error' );
 	}
 }

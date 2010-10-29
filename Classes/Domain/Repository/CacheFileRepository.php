@@ -83,7 +83,7 @@ class Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository {
 	public function removeFolder($id) {
 		$fileName = base64_decode ( $id );
 		if (FALSE === $fileName || FALSE !== strpos ( $fileName, '..' )) {
-			throw new Exception ( 'invalid id' );
+			throw new Exception ( 'invalid id: '.$id );
 		}
 		$path = $this->cacheDir . $fileName;
 		if (FALSE === is_dir ( $path )) {

@@ -61,7 +61,11 @@ class tx_staticfilecachemananger_modfunc1 extends t3lib_extobjbase {
 	function main() {
 		// Initializes the module. Done in this function because we may need to re-initialize if data is submitted!
 		global $SOBE, $BE_USER, $LANG, $BACK_PATH, $TCA_DESCR, $TCA, $CLIENT, $TYPO3_CONF_VARS;
-		$this->cacheManagementController = t3lib_div::makeInstance ( 'Tx_StaticfilecacheMananger_Controller_CacheManagementController');
+		
+		$cacheDatabaseEntryRepository = t3lib_div::makeInstance ( 'Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository' );
+		$cacheFileRepository = t3lib_div::makeInstance ( 'Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository' );
+		$view = t3lib_div::makeInstance ( 'Tx_StaticfilecacheMananger_View_View' );
+		$this->cacheManagementController = t3lib_div::makeInstance ( 'Tx_StaticfilecacheMananger_Controller_CacheManagementController', $cacheDatabaseEntryRepository, $cacheFileRepository, $view);
 		
 		$action = t3lib_div::_GP ( 'action' );
 		if(empty($action)){

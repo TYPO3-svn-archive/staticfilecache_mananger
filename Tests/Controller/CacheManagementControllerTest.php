@@ -37,13 +37,10 @@ class Tx_StaticfilecacheMananger_Controller_CacheManagementControllerTest extend
 	 * Prepares the environment before running a test.
 	 */
 	protected function setUp() {
-		$this->cacheManagementController = $this->getMock ( 'Tx_StaticfilecacheMananger_Controller_CacheManagementController', array ('__construct' ), array (), '', FALSE );
 		$this->cacheDatabaseEntryRepository = $this->getMock ( 'Tx_StaticfilecacheMananger_Domain_Repository_CacheDatabaseEntryRepository', array (), array (), '', FALSE );
 		$this->cacheFileRepository = $this->getMock ( 'Tx_StaticfilecacheMananger_Domain_Repository_CacheFileRepository', array (), array (), '', FALSE );
 		$this->view = $this->getMock ( 'Tx_StaticfilecacheMananger_View_View', array (), array (), '', FALSE );
-		$this->cacheManagementController->setCacheDatabaseEntryRepository ( $this->cacheDatabaseEntryRepository );
-		$this->cacheManagementController->setCacheFileRepository ( $this->cacheFileRepository );
-		$this->cacheManagementController->setView ( $this->view );
+		$this->cacheManagementController = new Tx_StaticfilecacheMananger_Controller_CacheManagementController ( $this->cacheDatabaseEntryRepository, $this->cacheFileRepository, $this->view);
 	}
 	/**
 	 * Cleans up the environment after running a test.
